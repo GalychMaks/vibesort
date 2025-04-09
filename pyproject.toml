@@ -1,0 +1,24 @@
+[project]
+name = "vibesort"
+version = "0.1.0"
+description = "Cluster songs into playlists based on audio similarity."
+authors = [
+  { name="Your Name", email="your@email.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "librosa",
+  "tqdm"
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]  # I for isort-style import sorting
+fixable = ["I"]
