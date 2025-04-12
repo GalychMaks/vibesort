@@ -15,7 +15,7 @@ class BaseVibeSorter(abc.ABC):
 
     def _configure_logger(self) -> logging.Logger:
         logger = logging.getLogger(self.__class__.__name__)
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.INFO)
 
         if not logger.handlers:
             handler = logging.StreamHandler()
