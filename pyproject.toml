@@ -9,7 +9,18 @@ readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
   "librosa",
-  "tqdm"
+  "tqdm",
+  "torch",
+  "torchaudio",
+  "transformers<=4.47.1",
+  "scikit-learn",
+  "numpy",
+  "soundfile"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pre-commit"
 ]
 
 [build-system]
