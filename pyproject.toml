@@ -3,7 +3,7 @@ name = "vibesort"
 version = "0.1.0"
 description = "Cluster songs into playlists based on audio similarity."
 authors = [
-  { name="Your Name", email="your@email.com" }
+  { name="Maksym Halych", email="galych0222@gmail.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.8"
@@ -22,3 +22,6 @@ package-dir = {"" = "src"}
 [tool.ruff.lint]
 select = ["E", "F", "I"]  # I for isort-style import sorting
 fixable = ["I"]
+
+[project.scripts]
+vibesort = "vibesort.cli:main"

@@ -18,7 +18,7 @@ def main():
         help="Number of playlists to generate",
     )
     parser.add_argument(
-        "--output", default="playlists_v2.json", help="Output file name"
+        "-o", "--output", default="playlists_v2.json", help="Output file name"
     )
     parser.add_argument(
         "--model",

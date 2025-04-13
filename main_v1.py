@@ -18,7 +18,7 @@ def main():
         help="Number of playlists to generate",
     )
     parser.add_argument(
-        "--output", default="playlists_v1.json", help="Output file name"
+        "-o", "--output", default="playlists_v1.json", help="Output file name"
     )
     args = parser.parse_args()
 
