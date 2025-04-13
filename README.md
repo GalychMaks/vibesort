@@ -59,7 +59,7 @@ Arguments:
 
 - `-p, --path`: Path to folder containing audio files (default: "data/audio/")
 - `-n, --num_clusters`: Number of playlists to generate (default: 3)
-- `-o, --output`: Output file name for the generated playlists (default: "playlists_v2.json" for deep method, "playlists_v1.json" for algo method)
+- `-o, --output`: Output file name for the generated playlists (optional, if not provided playlists will only be returned)
 - `--method`: Clustering method to use: 'deep' (default) or 'algo'
 - `--model`: MERT model to use with the deep method (default: "MERT-v1-95M")
 
@@ -72,22 +72,20 @@ from vibesort import DeepVibeSorter, AlgoVibeSorter
 
 # Using deep learning-based clustering (recommended)
 sorter = DeepVibeSorter(mert_model_name="MERT-v1-95M")
-sorter.run(
+playlists = sorter.run(
     folder_path="path/to/audio/folder",
-    num_clusters=3,
-    output_file="playlists.json"
+    num_clusters=3
 )
 
 # Or using classical audio feature-based clustering
 sorter = AlgoVibeSorter()
-sorter.run(
+playlists = sorter.run(
     folder_path="path/to/audio/folder",
-    num_clusters=3,
-    output_file="playlists.json"
+    num_clusters=3
 )
 ```
 
-The output will be a JSON file containing the generated playlists, where each song is grouped into a cluster based on its audio characteristics.
+The output will be a Python dictionary containing the generated playlists, where each song is grouped into a cluster based on its audio characteristics. If an output file is provided, the playlists will also be saved to that file as JSON.
 
 ## References
 

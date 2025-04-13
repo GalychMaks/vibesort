@@ -12,7 +12,7 @@ def get_audio_file_paths(folder_path: str) -> List[str]:
     ]
 
 
-def save_playlists(labels, file_paths, output_file: str):
+def save_playlists(labels, file_paths, output_file: str = None):
     playlists = {}
     for label, path in zip(labels, file_paths):
         label = int(label)
@@ -24,5 +24,8 @@ def save_playlists(labels, file_paths, output_file: str):
         ]
     }
 
-    with open(output_file, "w") as f:
-        json.dump(output, f, indent=2)
+    if output_file:
+        with open(output_file, "w") as f:
+            json.dump(output, f, indent=2)
+
+    return output

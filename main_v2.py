@@ -1,4 +1,5 @@
 import argparse
+import json
 
 from vibesort import DeepVibeSorter
 
@@ -18,7 +19,7 @@ def main():
         help="Number of playlists to generate",
     )
     parser.add_argument(
-        "-o", "--output", default="playlists_v2.json", help="Output file name"
+        "-o", "--output", default=None, help="Output file name (optional)"
     )
     parser.add_argument(
         "--model",
@@ -30,9 +31,10 @@ def main():
     args = parser.parse_args()
 
     sorter = DeepVibeSorter(mert_model_name=args.model)
-    sorter.run(
+    playlists = sorter.run(
         folder_path=args.path, num_clusters=args.num_clusters, output_file=args.output
     )
+    print(json.dumps(playlists, indent=2))
 
 
 if __name__ == "__main__":

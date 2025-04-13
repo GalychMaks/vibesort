@@ -27,7 +27,7 @@ class BaseVibeSorter(abc.ABC):
 
         return logger
 
-    def run(self, folder_path: str, num_clusters: int, output_file: str):
+    def run(self, folder_path: str, num_clusters: int, output_file: str = None):
         file_paths = get_audio_file_paths(folder_path)
         self.logger.info(f"Found {len(file_paths)} audio files to process.")
 
@@ -42,16 +42,20 @@ class BaseVibeSorter(abc.ABC):
 
         if not features:
             self.logger.error("No features extracted. Exiting.")
-            return
+            return None
 
         self.logger.debug(f"Feature array shape: {np.array(features).shape}")
 
         self.logger.info(f"Running clusterization with {num_clusters} clusters")
         labels = self._cluster_features(features, num_clusters)
 
-        self.logger.info(f"Saving playlists to: '{output_file}'")
-        save_playlists(labels, file_paths, output_file)
+        if output_file:
+            self.logger.info(f"Saving playlists to: '{output_file}'")
+
+        result = save_playlists(labels, file_paths, output_file)
         self.logger.info("All done. 🎧")
+
+        return result
 
     def _cluster_features(
         self, features: List[np.ndarray], num_clusters: int

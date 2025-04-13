@@ -1,4 +1,5 @@
 import argparse
+import json
 
 from vibesort import AlgoVibeSorter, DeepVibeSorter
 
@@ -20,8 +21,8 @@ def main():
     parser.add_argument(
         "-o",
         "--output",
-        default=None,
-        help="Output file name (auto-selected if not provided)",
+        default="playlists.json",
+        help="Output file name (optional)",
     )
     parser.add_argument(
         "--method",
@@ -40,17 +41,12 @@ def main():
     args = parser.parse_args()
 
     if args.method == "algo":
-        output_file = args.output or "playlists_v1.json"
         sorter = AlgoVibeSorter()
     else:
-        output_file = args.output or "playlists_v2.json"
         sorter = DeepVibeSorter(mert_model_name=args.model)
 
-    sorter.run(
-        folder_path=args.path,
-        num_clusters=args.num_clusters,
-        output_file=output_file,
-    )
+    playlists = sorter.run(folder_path=args.path, num_clusters=args.num_clusters)
+    print(json.dumps(playlists, indent=2))
 
 
 if __name__ == "__main__":
