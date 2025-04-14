@@ -117,7 +117,7 @@ Visualization of audio embeddings for It-Jim Trainee program 2025 Dataset Task 3
 
 ### PCA Comparison
 
-![PCA Comparison](output/comparison_pca.png)  
+![PCA Comparison](assets/comparison_pca.png)  
 [View full-size PCA comparison](output/comparison_pca.png)
 
 The PCA plots show how songs are clustered using dimensionality reduction based on their audio features.
@@ -128,8 +128,8 @@ The PCA plots show how songs are clustered using dimensionality reduction based 
 
 ### t-SNE Comparison
 
-![t-SNE Comparison](output/comparison_tsne.png)  
-[View full-size t-SNE comparison](output/comparison_tsne.png)
+![t-SNE Comparison](assets/comparison_tsne.png)  
+[View full-size t-SNE comparison](assets/comparison_tsne.png)
 
 The t-SNE plots illustrate how songs are grouped based on local similarities in a 2D space.
 

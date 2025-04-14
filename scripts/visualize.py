@@ -100,7 +100,7 @@ def main() -> None:
         reduced_dict = {
             name: reduce_dimensions(feats, method) for name, feats in features_dict.items()
         }
-        output_path = f"output/comparison_{method}.png"
+        output_path = f"assets/comparison_{method}.png"
         plot_comparison(reduced_dict, labels_dict, method, output_path)
         print(f"Saved: {output_path}")
 
