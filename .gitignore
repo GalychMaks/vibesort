@@ -1,6 +1,7 @@
 data/
-notes
+output/
 
+notes
 play_playlists.ipynb
 
 playlists_v1.json

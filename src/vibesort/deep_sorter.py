@@ -16,7 +16,7 @@ class DeepVibeSorter(BaseVibeSorter):
         "music2vec-v1",
     }
 
-    def __init__(self, mert_model_name: str = "m-a-p/MERT-v1-95M"):
+    def __init__(self, mert_model_name: str = "MERT-v1-95M"):
         super().__init__()
 
         if mert_model_name not in self.SUPPORTED_MODELS:
