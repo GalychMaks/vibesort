@@ -15,7 +15,8 @@ class AlgoVibeSorter(BaseVibeSorter):
         spectral_bandwidth = librosa.feature.spectral_bandwidth(y=y, sr=sr)
         spectral_rolloff = librosa.feature.spectral_rolloff(y=y, sr=sr)
         zero_crossings = librosa.feature.zero_crossing_rate(y)
-
+        rms = librosa.feature.rms(y=y)
+        tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
         # All output must be 1D arrays before concatenation
         features = np.concatenate(
             [
@@ -26,6 +27,8 @@ class AlgoVibeSorter(BaseVibeSorter):
                 np.array([np.mean(spectral_bandwidth)]),
                 np.array([np.mean(spectral_rolloff)]),
                 np.array([np.mean(zero_crossings)]),
+                np.array([np.mean(rms)]),
+                np.array(tempo),
             ]
         ).astype(np.float32)
 

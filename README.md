@@ -1,6 +1,30 @@
 # Vibesort
 
-Tool for clustering songs into playlists based on their audio characteristics and vibes. Vibesort analyzes audio features to automatically group similar songs together, creating cohesive playlists that match different moods or styles.
+Tool for clustering songs into playlists based on their audio characteristics and vibes. Vibesort offers two distinct approaches for analyzing and grouping music:
+
+1. **Extracted Features**:
+
+- Mel-Frequency Cepstral Coefficients (MFCCs): Captures the timbre of the track (13 coefficients, with both mean and standard deviation per coefficient).
+
+- Chroma STFT: Represents the harmonic and pitch class content.
+
+- Spectral Centroid: Indicates the center of mass of the spectrum, often perceived as the brightness of a sound.
+
+- Spectral Bandwidth: Measures the spread of the spectrum.
+
+- Spectral Rolloff: Frequency below which a specified percentage of the total spectral energy lies.
+
+- Zero Crossing Rate: The rate at which the audio signal changes sign, useful for detecting percussive or noisy sounds.
+
+- RMS Energy: Root-mean-square energy representing the loudness of the track.
+
+- Tempo: Estimated beats per minute (BPM), capturing the rhythmic feel of the audio.
+
+Each feature is summarized (usually by mean or standard deviation) to form a compact, fixed-size numerical representation of the song, suitable for machine learning or clustering algorithms.
+
+2. **Deep Learning Approach**: Leverages the MERT (Music Embedding through Representation Transformers) model to extract high-level musical features and semantic understanding of the audio content. This approach can capture more complex musical patterns and relationships that might be difficult to express through traditional audio features. 🔗 [Read the MERT paper (arXiv:2306.00107)](https://arxiv.org/pdf/2306.00107)
+
+Both approaches use K-means clustering on their respective embeddings to group similar songs together, creating cohesive playlists that match different moods or styles.
 
 ## Installation
 
