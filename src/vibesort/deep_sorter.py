@@ -8,6 +8,10 @@ from vibesort.base_sorter import BaseVibeSorter
 
 
 class DeepVibeSorter(BaseVibeSorter):
+    """
+    A deep learning-based vibe sorter that uses pretrained MERT models to extract audio embeddings.
+    """
+
     SUPPORTED_MODELS = {
         "MERT-v1-330M",
         "MERT-v1-95M",
@@ -17,6 +21,12 @@ class DeepVibeSorter(BaseVibeSorter):
     }
 
     def __init__(self, mert_model_name: str = "MERT-v1-95M"):
+        """
+        Initializes the DeepVibeSorter with a specified pretrained MERT model.
+
+        :param mert_model_name: Name of the pretrained model to load. Must be in SUPPORTED_MODELS.
+        :raises ValueError: If an unsupported model name is provided.
+        """
         super().__init__()
 
         if mert_model_name not in self.SUPPORTED_MODELS:
@@ -43,45 +53,60 @@ class DeepVibeSorter(BaseVibeSorter):
         # Lazy initialization of resampler
         self.resampler = None
 
-    def extract_features_for_file(self, path: str):
+    def extract_features_for_file(self, path: str) -> np.ndarray:
+        """
+        Extracts a deep embedding from an audio file using a pretrained MERT model.
+
+        The embedding is computed by:
+        - Resampling the audio to the model's target sample rate.
+        - Feeding it through the model to obtain hidden states from all layers.
+        - Averaging over time for each layer.
+        - Averaging the results across all layers to obtain a fixed-size embedding.
+
+        :param path: Path to the audio file.
+        :return: 1D numpy array representing the extracted feature vector.
+        """
+        #!!! Shapes can differ depending on the model, comments are for default model
+
         # Load audio file
-        audio, sr = sf.read(path)
+        audio, sr = sf.read(path)  # shape: (T,) or (T, C)
 
         # Convert stereo to mono
         if len(audio.shape) == 2:
-            audio = np.mean(audio, axis=1)
+            audio = np.mean(audio, axis=1)  # shape: (T,)
 
         # Resample if needed
-        audio_tensor = torch.from_numpy(audio).float()
+        audio_tensor = torch.from_numpy(audio).float()  # shape: (T,)
         if sr != self.target_sr:
             if self.resampler is None or self.resampler.orig_freq != sr:
                 self.resampler = T.Resample(orig_freq=sr, new_freq=self.target_sr)
-            audio_tensor = self.resampler(audio_tensor)
+            audio_tensor = self.resampler(audio_tensor)  # shape: (T',)
 
         # Tokenize input
         inputs = self.processor(
             audio_tensor.numpy(), sampling_rate=self.target_sr, return_tensors="pt"
-        )
+        )  # input_values shape: (1, T')
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
         # Get hidden states from MERT
         with torch.no_grad():
             outputs = self.model(**inputs, output_hidden_states=True)
             self.logger.debug(f"Outputs shape: {outputs.hidden_states[0].shape}")
+            # each hidden state: (1, T'', 768)
 
-        # Stack hidden states: [13 layers, time steps, 768]
+        # Stack hidden states: [13 layers, T'', 768]
         all_layer_hidden_states = torch.stack(outputs.hidden_states).squeeze()
-        self.logger.debug(
-            f"All layer hidden states shape: {all_layer_hidden_states.shape}"
-        )
+        # shape: (13, T'', 768)
 
-        # Average across time -> [13, 768]
+        self.logger.debug(f"All layer hidden states shape: {all_layer_hidden_states.shape}")
+
+        # Average across time -> shape: (13, 768)
         time_avg = all_layer_hidden_states.mean(dim=1)
         self.logger.debug(f"Time average shape: {time_avg.shape}")
 
-        # Then average across layers -> [768]
+        # Then average across layers -> shape: (768,)
         embedding = time_avg.mean(dim=0)
         self.logger.debug(f"Embedding shape: {embedding.shape}")
 
         # Return as NumPy array
-        return embedding.cpu().numpy().astype(np.float32)
+        return embedding.cpu().numpy().astype(np.float32)  # shape: (768,)

@@ -10,6 +10,10 @@ from sklearn.manifold import TSNE
 def reduce_dimensions(features: np.ndarray, method: str = "pca") -> np.ndarray:
     """
     Reduce feature dimensions to 2D using PCA or t-SNE.
+
+    :param features: High-dimensional feature matrix.
+    :param method: Dimensionality reduction method to use, either 'pca' or 'tsne'.
+    :return: 2D array of reduced feature representations.
     """
     if method == "tsne":
         n_samples = len(features)
@@ -23,6 +27,10 @@ def reduce_dimensions(features: np.ndarray, method: str = "pca") -> np.ndarray:
 def plot_clusters(reduced: np.ndarray, labels: np.ndarray, output_path: str) -> None:
     """
     Plot reduced features with cluster labels and save to file.
+
+    :param reduced: 2D reduced feature matrix.
+    :param labels: Cluster labels for each feature vector.
+    :param output_path: File path to save the resulting plot image.
     """
     plt.figure(figsize=(10, 8))
     unique_labels = np.unique(labels)
@@ -58,6 +66,11 @@ def visualize_clusters(
 ) -> None:
     """
     Visualize clustered feature vectors in 2D and save the plot to an image file.
+
+    :param features: List of feature vectors to visualize.
+    :param labels: Corresponding cluster labels for each feature.
+    :param output_image_path: Path to save the output image.
+    :param method: Dimensionality reduction method to use, either 'pca' or 'tsne'.
     """
     features_array = np.array(features)
     labels_array = np.array(labels)
@@ -66,7 +79,10 @@ def visualize_clusters(
     plot_clusters(reduced, labels_array, output_image_path)
 
 
-def main():
+def main() -> None:
+    """
+    Genreates 4 images using PCA and t-SNE for each of the two sorters.
+    """
     from vibesort.algo_sorter import AlgoVibeSorter
     from vibesort.deep_sorter import DeepVibeSorter
     from vibesort.utils import get_audio_file_paths
@@ -84,9 +100,7 @@ def main():
 
         for method in methods:
             output_path = f"output/{sorter_name}_{method}.png"
-            visualize_clusters(
-                features, labels, output_image_path=output_path, method=method
-            )
+            visualize_clusters(features, labels, output_image_path=output_path, method=method)
             print(f"Saved: {output_path}")
 
 

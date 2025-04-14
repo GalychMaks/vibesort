@@ -34,5 +34,8 @@ package-dir = {"" = "src"}
 select = ["E", "F", "I"]  # I for isort-style import sorting
 fixable = ["I"]
 
+[tool.ruff]
+line-length = 100
+
 [project.scripts]
 vibesort = "vibesort.cli:main"

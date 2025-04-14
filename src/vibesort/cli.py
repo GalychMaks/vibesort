@@ -4,7 +4,10 @@ import json
 from vibesort import AlgoVibeSorter, DeepVibeSorter
 
 
-def main():
+def main() -> None:
+    """
+    Main entry point for the vibe sorter CLI.
+    """
     parser = argparse.ArgumentParser(
         description="Cluster songs using classical audio features or MERT embeddings."
     )
