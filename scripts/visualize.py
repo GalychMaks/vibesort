@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,11 +9,11 @@ from sklearn.manifold import TSNE
 
 def reduce_dimensions(features: np.ndarray, method: str = "pca") -> np.ndarray:
     """
-    Reduce feature dimensions to 2D using PCA or t-SNE.
+    Reduce the dimensionality of feature data to 2D using PCA or t-SNE.
 
-    :param features: High-dimensional feature matrix.
-    :param method: Dimensionality reduction method to use, either 'pca' or 'tsne'.
-    :return: 2D array of reduced feature representations.
+    :param features: The high-dimensional feature array.
+    :param method: The dimensionality reduction method to use ('pca' or 'tsne').
+    :returns: The 2D reduced feature array.
     """
     if method == "tsne":
         n_samples = len(features)
@@ -24,84 +24,85 @@ def reduce_dimensions(features: np.ndarray, method: str = "pca") -> np.ndarray:
     return reducer.fit_transform(features)
 
 
-def plot_clusters(reduced: np.ndarray, labels: np.ndarray, output_path: str) -> None:
+def plot_comparison(
+    reduced_dict: Dict[str, np.ndarray],
+    labels_dict: Dict[str, np.ndarray],
+    method: str,
+    output_path: str,
+) -> None:
     """
-    Plot reduced features with cluster labels and save to file.
+    Plot a side-by-side comparison of 2D reduced features from different sorters.
 
-    :param reduced: 2D reduced feature matrix.
-    :param labels: Cluster labels for each feature vector.
-    :param output_path: File path to save the resulting plot image.
+    :param reduced_dict: A dictionary mapping sorter names to their reduced feature arrays.
+    :param labels_dict: A dictionary mapping sorter names to their cluster labels.
+    :param method: The dimensionality reduction method used ('pca' or 'tsne').
+    :param output_path: The path where the plot image will be saved.
     """
-    plt.figure(figsize=(10, 8))
-    unique_labels = np.unique(labels)
-    colormap = plt.get_cmap("tab10", len(unique_labels))
+    fig, axes = plt.subplots(1, 2, figsize=(16, 7))
+    colormap = plt.get_cmap("tab10")
 
-    for i, label in enumerate(unique_labels):
-        cluster_points = reduced[labels == label]
-        plt.scatter(
-            cluster_points[:, 0],
-            cluster_points[:, 1],
-            color=colormap(i),
-            label=f"Cluster {label}",
-            edgecolors="w",
-            linewidths=0.5,
-        )
+    for ax, (sorter_name, reduced) in zip(axes, reduced_dict.items()):
+        labels = labels_dict[sorter_name]
+        unique_labels = np.unique(labels)
 
-    plt.title("Audio Feature Clusters (2D)")
-    plt.xlabel("Component 1")
-    plt.ylabel("Component 2")
-    plt.legend(title="Clusters")
-    plt.grid(True)
+        for i, label in enumerate(unique_labels):
+            points = reduced[labels == label]
+            ax.scatter(
+                points[:, 0],
+                points[:, 1],
+                color=colormap(i),
+                label=f"Cluster {label}",
+                edgecolors="w",
+                linewidths=0.5,
+            )
 
+        ax.set_title(f"{sorter_name.capitalize()} ({method.upper()})")
+        ax.set_xlabel("Component 1")
+        ax.set_ylabel("Component 2")
+        ax.legend()
+        ax.grid(True)
+
+    plt.tight_layout()
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     plt.savefig(output_path)
     plt.close()
 
 
-def visualize_clusters(
-    features: List[np.ndarray],
-    labels: List[int],
-    output_image_path: str,
-    method: str = "pca",
-) -> None:
-    """
-    Visualize clustered feature vectors in 2D and save the plot to an image file.
-
-    :param features: List of feature vectors to visualize.
-    :param labels: Corresponding cluster labels for each feature.
-    :param output_image_path: Path to save the output image.
-    :param method: Dimensionality reduction method to use, either 'pca' or 'tsne'.
-    """
-    features_array = np.array(features)
-    labels_array = np.array(labels)
-
-    reduced = reduce_dimensions(features_array, method)
-    plot_clusters(reduced, labels_array, output_image_path)
-
-
 def main() -> None:
     """
-    Genreates 4 images using PCA and t-SNE for each of the two sorters.
+    Main execution function to extract features, perform clustering, reduce dimensions,
+    and plot visual comparisons using both PCA and t-SNE.
     """
     from vibesort.algo_sorter import AlgoVibeSorter
     from vibesort.deep_sorter import DeepVibeSorter
     from vibesort.utils import get_audio_file_paths
 
-    sorters = {"deep": DeepVibeSorter(), "algo": AlgoVibeSorter()}
-    methods = ["pca", "tsne"]
+    sorters: Dict[str, object] = {
+        "algo": AlgoVibeSorter(),
+        "deep": DeepVibeSorter(),
+    }
     folder_path = "data/audio"
     num_clusters = 3
+    file_paths: List[str] = get_audio_file_paths(folder_path)
 
-    file_paths = get_audio_file_paths(folder_path)
+    features_dict: Dict[str, np.ndarray] = {}
+    labels_dict: Dict[str, np.ndarray] = {}
 
-    for sorter_name, sorter_instance in sorters.items():
-        features = [sorter_instance.extract_features_for_file(p) for p in file_paths]
-        labels = sorter_instance._cluster_features(features, num_clusters)
+    # Extract features and labels
+    for sorter_name, sorter in sorters.items():
+        features = [sorter.extract_features_for_file(p) for p in file_paths]
+        labels = sorter._cluster_features(features, num_clusters)
+        features_dict[sorter_name] = np.array(features)
+        labels_dict[sorter_name] = np.array(labels)
 
-        for method in methods:
-            output_path = f"output/{sorter_name}_{method}.png"
-            visualize_clusters(features, labels, output_image_path=output_path, method=method)
-            print(f"Saved: {output_path}")
+    # Plot comparisons
+    for method in ["pca", "tsne"]:
+        reduced_dict = {
+            name: reduce_dimensions(feats, method) for name, feats in features_dict.items()
+        }
+        output_path = f"output/comparison_{method}.png"
+        plot_comparison(reduced_dict, labels_dict, method, output_path)
+        print(f"Saved: {output_path}")
 
 
 if __name__ == "__main__":
