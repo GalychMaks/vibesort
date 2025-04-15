@@ -4,6 +4,7 @@ from typing import List
 
 import numpy as np
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import normalize
 from tqdm import tqdm
 
 from vibesort.utils import get_audio_file_paths, save_playlists
@@ -86,9 +87,15 @@ class BaseVibeSorter(abc.ABC):
         :param num_clusters: Number of clusters to form.
         :return: List of cluster labels for each feature vector.
         """
+        # Convert list of features to a NumPy array
         features_array = np.array(features)
+
+        # Normalize the feature vectors to unit norm so that the cosine similarity is preserved.
+        normalized_features = normalize(features_array, norm="l2")
+
+        # Run k-means on the normalized vectors
         kmeans = KMeans(n_clusters=num_clusters, random_state=42)
-        return kmeans.fit_predict(features_array)
+        return kmeans.fit_predict(normalized_features)
 
     @abc.abstractmethod
     def extract_features_for_file(self, path: str) -> np.ndarray:

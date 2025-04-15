@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+from sklearn.preprocessing import normalize
 
 
 def reduce_dimensions(features: np.ndarray, method: str = "pca") -> np.ndarray:
@@ -107,9 +108,11 @@ def main() -> None:
 
     # Extract features and labels for each sorter
     for sorter_name, sorter in sorters.items():
+        # TODO: violated information expert principle
         features = [sorter.extract_features_for_file(p) for p in file_paths]
         labels = sorter._cluster_features(features, num_clusters)
-        features_dict[sorter_name] = np.array(features)
+        normalized_features = normalize(features, norm="l2")
+        features_dict[sorter_name] = np.array(normalized_features)
         labels_dict[sorter_name] = np.array(labels)
 
     # Perform dimensionality reduction and plot comparisons for both PCA and t-SNE.
