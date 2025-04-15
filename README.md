@@ -111,40 +111,27 @@ playlists = sorter.run(
 
 The output will be a Python dictionary containing the generated playlists, where each song is grouped into a cluster based on its audio characteristics. If an output file is provided, the playlists will also be saved to that file as JSON.
 
-## Visualization
+## Analysis
 
-Visualization of audio embeddings for It-Jim Trainee program 2025 Dataset Task 3 - Audio
+Analysis of audio embeddings for It-Jim Trainee program 2025 Dataset Task 3 - Audio
 
 ### PCA Comparison
 
 ![PCA Comparison](assets/comparison_pca.png)  
-[View full-size PCA comparison](output/comparison_pca.png)
-
-The PCA plots show how songs are clustered using dimensionality reduction based on their audio features.
-
-- The **Algo (PCA)** plot shows clusters formed using traditional features (e.g., MFCCs, tempo), resulting in more dispersed groupings with some overlap.
-
-- The **Deep (PCA)** plot, based on MERT embeddings, displays more compact and semantically cohesive clusters, highlighting a deeper understanding of musical similarity.
 
 ### t-SNE Comparison
 
 ![t-SNE Comparison](assets/comparison_tsne.png)  
-[View full-size t-SNE comparison](assets/comparison_tsne.png)
 
-The t-SNE plots illustrate how songs are grouped based on local similarities in a 2D space.
+### Insights
 
-- The Algo (t-SNE) plot shows moderate separation between clusters, driven by physical audio traits.
+In the Algo (PCA) approach, we can see that clusters are separated by horizontal lines, which indicates that the clustering algorithm relies mainly on the first principal component. A more detailed analysis shows that the first and second PCA components in the Algo approach explain 88.85% and 6.1% of the variance, respectively. This suggests that the Algo features are highly correlated.
 
-- The Deep (t-SNE) plot demonstrates clearer and more distinct cluster boundaries, indicating that deep embeddings better capture high-level musical vibes and moods.
+In contrast, the deep learning embeddings distribute the variance more evenly, with the first and second PCA components explaining 27.16% and 14.8% of the variance, respectively.
 
-🧠 Summary Comparison
+The plots also show that the Algo features form two main clusters, whereas the deep learning approach results in a more dispersed distribution in the feature space. However, this could be a consequence of projecting high-dimensional data (768D) into only two dimensions.
 
-| Aspect | Algo (Classical) | Deep (MERT) |
-| --- | --- | --- |
-| Cluster Compactness | Decent, some overlap | Very tight, especially Cluster 1 |
-| Separation Clarity | Moderate | Strong |
-| Likely Influential Data | Loudness, tempo, brightness | Mood, genre, harmony, instrument use |
-| Ideal Use Case | Technical breakdown, DJing | Mood-based playlists, music discovery |
+**The overall conclusion** is that deep learning embeddings better represent audio characteristics. However, the Algo approach, using a simple set of features, was able to form nearly the same clusters (9 out of 15 matches) while requiring significantly fewer computational resources.
 
 ## References
 
