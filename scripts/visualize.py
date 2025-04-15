@@ -31,7 +31,8 @@ def plot_comparison(
     output_path: str,
 ) -> None:
     """
-    Plot a side-by-side comparison of 2D reduced features from different sorters.
+    Plot a side-by-side comparison of 2D reduced features from different sorters,
+    and annotate each point with its song id corresponding to the sorted list of file paths.
 
     :param reduced_dict: A dictionary mapping sorter names to their reduced feature arrays.
     :param labels_dict: A dictionary mapping sorter names to their cluster labels.
@@ -41,10 +42,12 @@ def plot_comparison(
     fig, axes = plt.subplots(1, 2, figsize=(16, 7))
     colormap = plt.get_cmap("tab10")
 
+    # Use the same iteration order on both dicts.
     for ax, (sorter_name, reduced) in zip(axes, reduced_dict.items()):
         labels = labels_dict[sorter_name]
         unique_labels = np.unique(labels)
 
+        # Plot by clusters
         for i, label in enumerate(unique_labels):
             points = reduced[labels == label]
             ax.scatter(
@@ -54,6 +57,17 @@ def plot_comparison(
                 label=f"Cluster {label}",
                 edgecolors="w",
                 linewidths=0.5,
+            )
+
+        # Annotate each point with its song id (based on the sorted file order)
+        for idx, (x, y) in enumerate(reduced):
+            # The song id is the index+1
+            ax.annotate(
+                str(idx + 1),
+                (x, y),
+                textcoords="offset points",
+                xytext=(3, 3),
+                fontsize=8,
             )
 
         ax.set_title(f"{sorter_name.capitalize()} ({method.upper()})")
@@ -83,19 +97,22 @@ def main() -> None:
     }
     folder_path = "data/audio"
     num_clusters = 3
+
+    # Retrieve and sort file paths by alphabet
     file_paths: List[str] = get_audio_file_paths(folder_path)
+    file_paths = sorted(file_paths)  # Ensure files are processed in alphabetical order
 
     features_dict: Dict[str, np.ndarray] = {}
     labels_dict: Dict[str, np.ndarray] = {}
 
-    # Extract features and labels
+    # Extract features and labels for each sorter
     for sorter_name, sorter in sorters.items():
         features = [sorter.extract_features_for_file(p) for p in file_paths]
         labels = sorter._cluster_features(features, num_clusters)
         features_dict[sorter_name] = np.array(features)
         labels_dict[sorter_name] = np.array(labels)
 
-    # Plot comparisons
+    # Perform dimensionality reduction and plot comparisons for both PCA and t-SNE.
     for method in ["pca", "tsne"]:
         reduced_dict = {
             name: reduce_dimensions(feats, method) for name, feats in features_dict.items()

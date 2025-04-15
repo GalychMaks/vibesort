@@ -49,7 +49,7 @@ class BaseVibeSorter(abc.ABC):
         :param output_file: Optional path to save the result as a JSON file.
         :return: Dictionary containing the clustered playlists.
         """
-        file_paths = get_audio_file_paths(folder_path)
+        file_paths = sorted(get_audio_file_paths(folder_path))
         self.logger.info(f"Found {len(file_paths)} audio files to process.")
 
         self.logger.info("Extracting features from audio files...")
